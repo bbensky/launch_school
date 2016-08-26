@@ -1,0 +1,13 @@
+string = "Welcome to America!"
+a = string[6]
+
+This returns "e".
+
+b = string[11]
+
+This returns "A".
+
+c = string[19]
+
+This returns nil.
+

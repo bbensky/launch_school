@@ -1,0 +1,148 @@
+1.
+
+puts "Please type something in."
+puts gets.chomp
+
+1. a.
+
+puts ">> Type anything you want."
+answer = gets
+puts answer
+
+2.
+
+puts ">> What is your age in years?"
+
+age_in_years = gets.to_i
+
+age_in_months = age_in_years * 12
+
+puts "You are #{age_in_months} years old."
+
+3. 
+def something
+  puts ">> Do you want me to print something? (y/n)"
+  answer = gets.chomp
+  puts 'something' if answer == 'y'
+end
+
+3. a.
+
+def something
+  puts ">> Do you want me to print something? (y/n)"
+  answer = gets.chomp
+  puts 'something' if answer.downcase == 'y'
+end
+
+4.
+
+def something
+  loop do
+    puts ">> Do you want me to print something? (y/n)"
+    answer = gets.chomp.downcase
+    if answer == 'y' || answer == 'n'
+      puts "something" if answer == 'y'
+      break
+    else
+      puts "Invalid input! Please enter y or n" 
+    end 
+  end  
+end
+
+
+4. a.
+
+def something
+  answer = nil
+  loop do
+    puts ">> Do you want me to print something? (y/n)"
+    answer = gets.chomp.downcase
+    break if %w(y n).include?(answer)
+    puts "Invalid input! Please enter y or n" 
+  end
+  puts 'something' if answer == 'y'
+end
+
+5.
+
+def best
+  number = nil
+  loop do
+    puts ">> How many output lines do you want? Enter a number >= 3:"
+    number = gets.chomp.to_i
+    break if number >= 3
+    puts "That's not enough lines."
+  end
+  number.times do
+    puts "Launch School is the best!"
+  end
+end
+
+5.a
+
+def best
+  number = nil
+  loop do
+    puts ">> How many output lines do you want? Enter a number >= 3:"
+    number = gets.chomp.to_i
+    break if number >= 3
+    puts "That's not enough lines."
+  end
+  while number > 0
+    puts "Launch School is the best!"
+    number -= 1
+  end
+end
+
+6.
+
+PASSWORD = 'pass'
+
+loop do 
+  puts ">> Please enter your password:"
+  user_attempt = gets.chomp
+  break if user_attempt == PASSWORD
+  puts ">> Invalid password!"
+end
+puts "Welcome!"
+
+7.
+
+  USERS = 'Brian'
+  PASSWORD = 'gringotech'
+  loop do
+    puts ">> Please enter your user name:"
+    user_attempt = gets.chomp
+    puts ">> Please enter your password:"
+    password_attempt = gets.chomp
+    break if user_attempt == USERS && password_attempt == PASSWORD
+    puts ">> Authorization failed!"
+  end
+  puts "Welcome!"
+
+8.
+
+see dividing_numbers.rb
+
+8. a
+
+see dividing numbers_alt.rb
+
+9. 
+
+see ls_printer_2.rb
+
+9. a.
+
+two input vars, 2 breaks
+(see ls_printer_2_alt.rb ... but try again?)
+
+10.
+
+see opposites.rb
+
+10. alt
+
+refactor input number method
+
+

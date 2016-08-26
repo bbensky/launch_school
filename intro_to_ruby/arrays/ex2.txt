@@ -1,0 +1,15 @@
+1. arr = ["b", "a"]
+   arr = arr.product(Array(1..3))
+   arr.first.delete(arr.first.last)
+
+  This will return 1, the value that is deleted from index 1 from the array at index 0 of arr.
+  At the end of the program, the value for arr is:
+  [["b"], ["b", 2], ["b", 3], ["a", 1], ["a", 2], ["a", 3]]
+
+2. arr = ["b", "a"]
+   arr = arr.product([Array(1..3)])
+   arr.first.delete(arr.first.last)
+
+   This will return [1, 2, 3], the value that is deleted from index 1 from the array at index 0 of arr. 
+   At the end of the program, the value for arr is:
+   [["b"], ["a", [1, 2, 3]]]

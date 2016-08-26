@@ -1,0 +1,6 @@
+movies = [1977, 1972, 1982, 1974, 2000]
+puts movies[0]
+puts movies[1]
+puts movies[2]
+puts movies[3]
+puts movies[4]

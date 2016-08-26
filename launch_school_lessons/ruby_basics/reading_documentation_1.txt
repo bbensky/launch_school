@@ -1,0 +1,19 @@
+1. http://ruby-doc.org/core-2.3.1/
+
+2. http://ruby-doc.org/core-2.3.1/doc/syntax/control_expressions_rdoc.html
+
+3. nil, unless break supplies the value.
+
+4. nil if no arguments are passed to it, or the value of the argument if one is passed to it.
+
+5. By using underscores between numbers, eg. 123_456_789.
+
+6. :Brian
+
+7. [4, 5, 3, 6]
+
+8. http://ruby-doc.org/core-2.3.1/String.html
+
+9. http://ruby-doc.org/core-2.3.1/String.html#method-i-rjust
+
+10. File#path is an instance method, File::path is a class method.

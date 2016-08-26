@@ -1,0 +1,29 @@
+1. result = "xyz".upcase
+
+2. a.insert(3, 5, 6, 7)
+
+3. The first statement will print: ["abc", "def", "ghi,jkl", "mno", "pqr,stu", "vwx", "yz"]
+The second statement will print: ["abc def ghi", "jkl mno pqr", "stu vwx yz"]
+The third statement will print: ["abc def ghi", "jkl mno pqr,stu vwx yz"]
+
+4. -4712-01-01
+2016-01-01
+2016-05-01
+2016-05-13
+
+5. puts a.bsearch { |x| x > 8 }
+
+6. "IndexError: index 7 outside of array bounds: -5..5"
+"beats me"
+49
+
+7. 
+5
+8
+
+8. s.public_methods(all=false).inspect
+
+9. puts a.min(2)
+
+10. http://ruby-doc.org/stdlib-2.3.1/libdoc/psych/rdoc/Psych.html#method-c-load_file
+

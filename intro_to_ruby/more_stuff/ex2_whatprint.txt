@@ -1,0 +1,8 @@
+def execute(&block)
+  block
+end
+
+execute { puts "Hello from inside the execute method!" }
+
+1. This program will not print anything to the screen. It never activated the block with the .call method.
+2. It returns: #<Proc:0x007fd10b805848@testex2.rb:5> This is a Proc object.

@@ -1,0 +1,19 @@
+def execute(block)
+  block.call
+end
+
+execute { puts "Hello from inside the execute method!" }
+
+Error:
+
+block.rb1:in `execute': wrong number of arguments (0 for 1) (ArgumentError)
+from test.rb:5:in `<main>'
+
+To have a block passed as a paramter in a method, the variable in parens must be preceded by an ampersand.
+The code must look like this to execute properly:
+
+def execute(&block)
+  block.call
+end
+
+execute { puts "Hello from inside the execute method!" }

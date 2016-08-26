@@ -1,0 +1,4 @@
+Favorite Ruby/Rails API?
+
+I like Ruby-Doc.org. It's the simplest to understand and navigate.
+

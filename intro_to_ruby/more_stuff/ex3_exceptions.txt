@@ -1,0 +1,1 @@
+Exception handling manages errors when code is run, allowing code to continue running when errors are encountered. This is important because, without exception handling, a program would stop running if it encountered an error.

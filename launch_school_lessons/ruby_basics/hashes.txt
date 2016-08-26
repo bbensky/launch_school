@@ -1,0 +1,143 @@
+1.
+
+car = { type: 'sedan', color: 'blue', mileage: 80_000 }
+
+alt:
+car = { 
+  type: 'sedan', 
+  color: 'blue', 
+  mileage: 80_000 
+}
+
+2.
+
+car = {
+  type:    'sedan',
+  color:   'blue',
+  mileage: 80_000
+}
+
+car[:year] = 2003
+
+3.
+
+car = {
+  type:    'sedan',
+  color:   'blue',
+  mileage: 80_000,
+  year:    2003
+}
+
+car.delete(:mileage)
+
+4.
+
+car = {
+  type:    'sedan',
+  color:   'blue',
+  year:    2003
+}
+
+puts car[:color]
+
+5.
+
+numbers = {
+  high:   100,
+  medium: 50,
+  low:    10
+}
+
+numbers.each do |level, number|
+  puts "A #{level} number is #{number}."
+end
+
+6.
+
+numbers = {
+  high:   100,
+  medium: 50,
+  low:    10
+}
+
+half_numbers = numbers.map do |key, value|
+                 value / 2 
+               end
+
+p half_numbers 
+
+7.
+
+numbers = {
+  high:   100,
+  medium: 50,
+  low:    10
+}
+
+low_numbers = numbers.select do |key, value|
+                value < 25
+              end
+
+8.
+
+numbers = {
+  high:   100,
+  medium: 50,
+  low:    10
+}
+
+low_numbers = numbers.select! do |key, value|
+                 value < 25
+               end
+
+p low_numbers
+p numbers
+
+alt:
+
+numbers = {
+  high:   100,
+  medium: 50,
+  low:    10
+}
+
+numbers.select! do |key, value|
+                 value < 25
+               end
+
+p numbers
+
+9.
+
+cars = {
+  Car: {
+    type: 'sedan',
+    color: 'blue',
+    year: 2003
+  },
+  Truck: {
+    type: 'pickup',
+    color: 'red',
+    year: 1998
+  }
+} 
+
+
+
+
+
+
+
+10.
+
+car = {
+  type:  'sedan',
+  color: 'blue',
+  year:  2003
+}
+
+car = [
+  [:type, 'sedan'],
+  [:color, 'blue'],
+  [:year, 2003]
+]

@@ -1,0 +1,3 @@
+Older version of ruby: The major difference between an Array and a Hash is that an Array is an ordered list of values, and a Hash is unordered.
+
+Newer version of ruby: The major difference is that arrays are just lists of elements, while hashes are collections of key-value pairs.

@@ -1,0 +1,7 @@
+x = "hi there"
+my_hash = {x: "some value"}
+my_hash2 = {x => "some value"}
+
+  In my_hash1, the key is a symbol called x.
+  In my_hash2, the key is "hi there", which is the value that
+the variable x is pointing to.
