@@ -5,7 +5,7 @@ end
 # Methods to format numbers to pass validation
 
 def remove_extra_characters(number)
-  number.delete(", % $")
+  number.gsub!(/[^0-9.]/, '')
 end
 
 def fix_double_zeros_after_decimal(number)
@@ -19,7 +19,7 @@ def fix_number_starting_with_decimal(number)
 end
 
 def format_number(number)
-  number = remove_extra_characters(number)
+  remove_extra_characters(number)
   number = fix_double_zeros_after_decimal(number)
   fix_number_starting_with_decimal(number)
 end
@@ -35,7 +35,7 @@ def float?(number)
 end
 
 def valid_number?(number)
-  (integer?(number) || float?(number)) && (number.to_f >= 0)
+  (integer?(number) || float?(number))
 end
 
 # Method to input and return a valid number
@@ -67,7 +67,7 @@ end
 prompt("Welcome to the Loan Calculator.")
 
 loop do
-  loan_amount = get_input("Please enter the loan amount in dollars.")
+  loan_amount = get_input("Please enter the loan amount.")
 
   apr = get_input("Please enter the APR as a percent.")
   rate_in_months = apr / 100 / 12
@@ -78,7 +78,7 @@ loop do
   monthly_payment = payment_calculation(loan_amount, rate_in_months,
                                         duration_in_months)
 
-  prompt("Your monthly payment will be $#{monthly_payment}")
+  prompt("Your monthly payment will be #{monthly_payment}")
 
   prompt("'Y' if you would like to try another calculation.")
   prompt("Use any other key to exit.")
