@@ -50,7 +50,7 @@ def get_input(instructions)
   end
 end
 
-# method to calculate payment
+# Method to calculate payment
 
 def payment_calculation(loan_amount, rate_in_months, months_to_pay)
   monthly_payment = if months_to_pay.zero?
