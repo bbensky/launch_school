@@ -21,7 +21,7 @@ end
 def format_number(number)
   number = remove_extra_characters(number)
   number = fix_double_zeros_after_decimal(number)
-  return fix_number_starting_with_decimal(number)
+  fix_number_starting_with_decimal(number)
 end
 
 # Methods to validate the number
@@ -53,15 +53,14 @@ end
 # method to calculate payment
 
 def payment_calculation(loan_amount, rate_in_months, months_to_pay)
-  monthly_payment = if rate_in_months.zero? && months_to_pay.zero?
-              loan_amount
-            elsif rate_in_months.zero?
-              loan_amount / months_to_pay
-            elsif months_to_pay.zero?
-              loan_amount
-            else
-              loan_amount * (rate_in_months / (1 - (1 + rate_in_months)**-months_to_pay))
-            end
+  monthly_payment = if months_to_pay.zero?
+                      loan_amount
+                    elsif rate_in_months.zero?
+                      loan_amount / months_to_pay
+                    else
+                      loan_amount * (rate_in_months /
+                        (1 - (1 + rate_in_months)**-months_to_pay))
+                    end
   format("%.2f", monthly_payment)
 end
 
@@ -73,9 +72,11 @@ loop do
   apr = get_input("Please enter the APR as a percent.")
   rate_in_months = apr / 100 / 12
 
-  months_to_pay = get_input("Please enter the loan duration in months.")
+  duration_in_years = get_input("Please enter the loan duration in years.")
+  duration_in_months = duration_in_years * 12
 
-  monthly_payment = payment_calculation(loan_amount, rate_in_months, months_to_pay)
+  monthly_payment = payment_calculation(loan_amount, rate_in_months,
+                                        duration_in_months)
 
   prompt("Your monthly payment will be $#{monthly_payment}")
 
