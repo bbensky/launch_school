@@ -85,9 +85,7 @@ loop do
         (score['computer'] == POINTS_TO_WIN)
 
     player_choice = set_player_choice
-
     computer_choice = VALID_CHOICES.values().sample()
-
     prompt("You chose #{player_choice}; Computer chose #{computer_choice}")
 
     round_winner = calculate_round_results(player_choice, computer_choice)
