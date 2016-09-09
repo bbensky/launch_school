@@ -42,54 +42,54 @@ end
 
 def calculate_round_results(player, computer)
   if round_win?(player, computer)
-    'player'
+    :player
   elsif round_win?(computer, player)
-    'computer'
+    :computer
   else
-    'tie'
+    :tie
   end
 end
 
 def display_round_results(score, winner)
-  if winner == 'player'
+  if winner == :player
     prompt('You won this round!')
-  elsif winner == 'computer'
+  elsif winner == :computer
     prompt('Computer won this round!')
   else
     prompt("It's a tie!")
   end
-  prompt("You have #{score['player']} points.")
-  prompt("Computer has #{score['computer']} points.")
+  prompt("You have #{score[:player]} points.")
+  prompt("Computer has #{score[:computer]} points.")
   prompt('')
 end
 
 def add_point(score, winner)
-  score[winner] = score[winner] + 1
+  score[winner] += 1
 end
 
 def display_match_results(score)
-  if score['player'] == POINTS_TO_WIN
+  if score[:player] == POINTS_TO_WIN
     prompt('You won the match!')
   else
-    prompt('Computer won the match!')
+    prompt('Bazinga! Computer won the match!')
   end
 end
 
 loop do
-  score = { 'player' => 0, 'computer' => 0 }
+  score = { player: 0, computer: 0 }
 
   prompt("Welcome to Rock Paper Scissors Lizard Spock!")
   prompt("First to #{POINTS_TO_WIN} points wins.")
 
-  until (score['player'] == POINTS_TO_WIN) ||
-        (score['computer'] == POINTS_TO_WIN)
+  until (score[:player] == POINTS_TO_WIN) ||
+        (score[:computer] == POINTS_TO_WIN)
 
     player_choice = set_player_choice
     computer_choice = VALID_CHOICES.values().sample()
     prompt("You chose #{player_choice}; Computer chose #{computer_choice}")
 
     round_winner = calculate_round_results(player_choice, computer_choice)
-    add_point(score, round_winner) if round_winner != 'tie'
+    add_point(score, round_winner) if round_winner != :tie
     display_round_results(score, round_winner)
   end
 
@@ -100,4 +100,4 @@ loop do
   break unless answer.downcase().start_with?('y')
 end
 
-prompt('Thank you for playing. Good Bye!')
+prompt('Thank you for playing.')
