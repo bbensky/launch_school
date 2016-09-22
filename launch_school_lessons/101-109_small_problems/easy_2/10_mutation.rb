@@ -27,4 +27,3 @@ puts array2
 
 # More complex fix:
 # array1.map! { |value| value.upcase if value.start_with?('C') }
-# or (this is a simpler way)
