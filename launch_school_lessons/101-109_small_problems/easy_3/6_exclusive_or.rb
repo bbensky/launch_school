@@ -9,9 +9,9 @@
 
 # alt
 
-# def xor?(boolean1, boolean2)
-#   true if boolean1 != boolean2
-# end
+def xor?(boolean1, boolean2)
+  boolean1 != boolean2
+end
 
 # alt
 
