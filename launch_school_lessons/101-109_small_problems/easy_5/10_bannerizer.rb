@@ -72,8 +72,6 @@ def print_in_box(text)
   puts empty_line, horizontal_rule
 end
 
-
-
 print_in_box('To boldly go where no one has gone before.')
 print_in_box('')
 print_in_box('To boldly go where no one has gone before. Why see the same thing twice? Or three times? Or four times?')
