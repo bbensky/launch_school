@@ -14,9 +14,13 @@ def initialize_deck
   deck
 end
 
+def face_card?(card)
+  card != card.to_s.to_i
+end
+
 def joinor(hand)
   capitalized_cards = hand.map do |card|
-    card != card.to_s.to_i ? card.capitalize : card
+    face_card?(card) ? card.capitalize : card
   end
 
   if hand.size > 2
@@ -39,20 +43,21 @@ def get_player_input(message, valid_options)
   input[0]
 end
 
-def hit!(deck, hand)
+def receive_player_move
+  move = get_player_input("h to hit, s to stay", [['h', 's'], ['hit', 'stay']])
+  move
+end
+
+def deal_one_card!(deck, hand)
   suit = deck.keys.sample
   card = deck[suit].sample
-  remove_card_from_deck!(deck, suit, card)
+  deck[suit].delete(card)
   hand << card
 end
 
-def remove_card_from_deck!(deck, suit, card)
-  deck[suit].delete(card)
-end
-
-def deal!(deck, hands)
+def initial_deal!(deck, hands)
   hands.each do |hand|
-    STARTING_NUMBER_OF_CARDS.times { hit!(deck, hand) }
+    STARTING_NUMBER_OF_CARDS.times { deal_one_card!(deck, hand) }
   end
 end
 
@@ -62,8 +67,8 @@ end
 
 def calculate_aces_value(total, aces)
   difference_with_bust_limit = BUST_LIMIT - total
-  aces_with_11 = 11 + (aces - 1)
-  aces_with_11 <= difference_with_bust_limit ? aces_with_11 : aces
+  aces_counting_an_11 = 11 + (aces - 1)
+  aces_counting_an_11 <= difference_with_bust_limit ? aces_counting_an_11 : aces
 end
 
 def update_total(hand)
@@ -105,6 +110,10 @@ def display_result(game_result, player_total, dealer_total)
   end
 end
 
+def play_again?
+  get_player_input("Play again (y or n)?", [['y', 'n'], ['yes', 'no']])
+end
+
 loop do
   system('clear') || system('cls')
 
@@ -113,7 +122,7 @@ loop do
   player_cards = []
   dealer_cards = []
 
-  deal!(deck, [player_cards, dealer_cards])
+  initial_deal!(deck, [player_cards, dealer_cards])
 
   player_total = update_total(player_cards)
   dealer_total = update_total(dealer_cards)
@@ -123,10 +132,9 @@ loop do
   display_player_hand_and_total(player_cards, player_total)
 
   loop do
-    player_move = get_player_input("h to hit, s to stay",
-                                   [['h', 's'], ['hit', 'stay']])
+    player_move = receive_player_move
     if player_move == 'h'
-      hit!(deck, player_cards)
+      deal_one_card!(deck, player_cards)
       player_total = update_total(player_cards)
       display_player_hand_and_total(player_cards, player_total)
     end
@@ -142,7 +150,7 @@ loop do
   if !busted?(player_total)
     loop do
       break if dealer_total >= 17
-      hit!(deck, dealer_cards)
+      deal_one_card!(deck, dealer_cards)
       dealer_total = update_total(dealer_cards)
     end
 
@@ -154,8 +162,7 @@ loop do
     end
   end
 
-  replay = get_player_input("Play again (y or n)?", [['y', 'n'], ['yes', 'no']])
-  break if replay == 'n'
+  break if play_again? == 'n'
 end
 
 prompt("Thank you for playing 21! Good bye.")
