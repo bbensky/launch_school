@@ -1,0 +1,14 @@
+Pet
+|run
+|jump
+|
+|
+|--->Dog
+|     |speak
+|     |fetch
+|     |swim
+|     |--->Bulldog
+|           |swim
+|      
+|--->Cat
+      |speak
