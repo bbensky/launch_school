@@ -1,5 +1,3 @@
-require 'pry'
-
 module VisualEnhancement
   def clear_screen
     system('clear') || system('cls')
