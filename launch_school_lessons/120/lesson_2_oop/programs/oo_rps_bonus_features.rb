@@ -1,106 +1,117 @@
+require 'pry'
+
 module VisualEnhancement
   def clear_screen
-    system('clear') || system('clr')
+    system('clear') || system('cls')
   end
 end
 
 class Move
-  VALUES = ['rock', 'paper', 'scissors', 'lizard', 'Spock'].freeze
+  VALID_CHOICES = { 'r'  => :rock,
+                    'p'  => :paper,
+                    's'  => :scissors,
+                    'l'  => :lizard,
+                    'sp' => :Spock }
 
   attr_reader :value
+
+  def to_s
+    value.to_s
+  end
 end
 
 class Rock < Move
   def initialize
-    @value = 'rock'
+    @value = :rock
   end
 
   def >(other_move)
-    ['lizard', 'scissors'].include?(other_move.value)
+    [:lizard, :scissors].include?(other_move.value)
   end
 
   def <(other_move)
-    ['paper', 'Spock'].include?(other_move.value)
+    [:paper, :Spock].include?(other_move.value)
   end
 end
 
 class Paper < Move
   def initialize
-    @value = 'paper'
+    @value = :paper
   end
 
   def >(other_move)
-    ['rock', 'Spock'].include?(other_move.value)
+    [:rock, :Spock].include?(other_move.value)
   end
 
   def <(other_move)
-    ['scissors', 'lizard'].include?(other_move.value)
+    [:scissors, :lizard].include?(other_move.value)
   end
 end
 
 class Scissors < Move
   def initialize
-    @value = 'scissors'
+    @value = :scissors
   end
 
   def >(other_move)
-    ['paper', 'lizard'].include?(other_move.value)
+    [:paper, :lizard].include?(other_move.value)
   end
 
   def <(other_move)
-    ['rock', 'Spock'].include?(other_move.value)
+    [:rock, :Spock].include?(other_move.value)
   end
 end
 
 class Lizard < Move
   def initialize
-    @value = 'lizard'
+    @value = :lizard
   end
 
   def >(other_move)
-    ['Spock', 'paper'].include?(other_move.value)
+    [:Spock, :paper].include?(other_move.value)
   end
 
   def <(other_move)
-    ['rock', 'scissors'].include?(other_move.value)
+    [:rock, :scissors].include?(other_move.value)
   end
 end
 
 class Spock < Move
   def initialize
-    @value = 'Spock'
+    @value = :Spock
   end
 
   def >(other_move)
-    ['scissors', 'rock'].include?(other_move.value)
+    [:scissors, :rock].include?(other_move.value)
   end
 
   def <(other_move)
-    ['paper', 'lizard'].include?(other_move.value)
+    [:paper, :lizard].include?(other_move.value)
   end
 end
 
 class MoveHistory
   include VisualEnhancement
 
-  attr_reader :move_data
+  attr_reader :move_history
 
   def initialize
-    @move_data = []
+    @move_history = []
   end
 
-  def record_round(human_move, computer_move)
-    @move_data << [human_move.value, computer_move.value]
+  def update_move_history!(human_move, computer_move)
+    @move_history << [human_move, computer_move]
   end
 
   def display_move_history(human_name, computer_name)
     clear_screen
     puts "Move History:"
-    1.upto(@move_data.length) do |round|
+
+    1.upto(@move_history.length) do |round|
       index = round - 1
       puts "Round #{round}: #{human_name} chose " \
-           "#{@move_data[index][0]}, " \
-           "#{computer_name} chose #{@move_data[index][1]}."
+           "#{@move_history[index][0]}, " \
+           "#{computer_name} chose #{@move_history[index][1]}."
     end
   end
 end
@@ -147,62 +158,50 @@ class Human < Player
     loop do
       puts "What's your name?"
       n = gets.chomp
-      break unless n.empty?
-      puts "Sorry, must enter a value."
+      break unless n.empty? || n[0] == ' '
+      puts "Sorry, you must enter a value."
     end
     @name = n
   end
 
+  def display_choice_options
+    puts "Please enter the abbreviation for your choice:"
+    Move::VALID_CHOICES.each do |abr, shape|
+      puts "#{abr} = #{shape}"
+    end
+  end
+
   def user_enters_choice
     choice = nil
+
     loop do
-      puts "Please choose rock, paper, scissors, lizard or Spock:"
+      display_choice_options
       choice = gets.chomp.downcase
-      choice.capitalize! if choice == 'spock'
-      break if Move::VALUES.include? choice
+      break if Move::VALID_CHOICES.keys.include? choice
       puts
       puts "Sorry, invalid choice."
     end
+
     choice
   end
 
   def choose
     choice = user_enters_choice
     case choice
-    when 'rock'     then @move = Rock.new
-    when 'paper'    then @move = Paper.new
-    when 'scissors' then @move = Scissors.new
-    when 'lizard'   then @move = Lizard.new
-    when 'Spock'    then @move = Spock.new
-    end
-  end
-end
-
-class ComputerRuleTracker
-  def initialize
-    @round_history = { human_won: 0, computer_chose_rock: 0 }
-  end
-
-  def update_round_history!(computer_move)
-    @round_history[:human_won] += 1
-    @round_history[:computer_chose_rock] += 1 if computer_move == 'rock'
-  end
-
-  def implement_rule?
-    if (@round_history[:human_won]).positive?
-      (@round_history[:computer_chose_rock] / @round_history[:human_won]) > 0.6
-    else
-      false
+    when 'r'  then @move = Rock.new
+    when 'p'  then @move = Paper.new
+    when 's'  then @move = Scissors.new
+    when 'l'  then @move = Lizard.new
+    when 'sp' then @move = Spock.new
     end
   end
 end
 
 class Computer < Player
-  attr_reader :rules
+  attr_reader :strategy
 
   def initialize
     super
-    @rules = ComputerRuleTracker.new
     @strategy = set_strategy
   end
 
@@ -212,77 +211,111 @@ class Computer < Player
 
   def set_strategy
     clear_screen
+
     choice = nil
     loop do
-      puts "Would you like the computer to play with (please choose 1 or 2):"
-      puts "1) adaptive rules"
-      puts "2) a fixed personality?"
+      puts "Your opponent can play with fixed behavior, or it can adapt to"
+      puts "patterns in the gameplay. Please enter 1 or 2:"
+      puts "1) fixed behavior"
+      puts "2) adaptive behavior"
+
       choice = gets.chomp.to_i
       break if [1, 2].include?(choice)
       puts "Sorry, invalid choice."
       puts
     end
-    choice == 1 ? :adaptive : :personality
+
+    choice == 1 ? FixedPersonality.new(@name) : Adaptive.new
   end
 
-  def determine_personality_behavior
-    case @name
-    when 'R2D2'     then { 'rock' => (0..100) }
-    when 'Hal'      then { 'rock' => (0..5), 'scissors' => (6..50),
-                           'lizard' => (51..75), 'Spock' => (76..100) }
-    when 'Chappie'  then { 'rock' => (0..33), 'paper' => (34..66),
-                           'scissors' => (67..100) }
-    when 'Sonny'    then { 'rock' => (0..20), 'paper' => (21..40),
-                           'scissors' => (41..60), 'lizard' => (61..80),
-                           'Spock' => (81..100) }
-    when 'Number 5' then { 'paper' => (0..50), 'Spock' => (51..100) }
+  # def determine_choice
+  #   if @strategy == :adaptive
+  #     if rules.implement_rule?
+  #       rule_based_choice
+  #     else
+  #       standard_choice
+  #     end
+  #   else
+  #     personality_based_choice
+  #   end
+  # end
+
+  def choose
+    choice = @strategy.choose
+    case choice
+    when :rock     then @move = Rock.new
+    when :paper    then @move = Paper.new
+    when :scissors then @move = Scissors.new
+    when :lizard   then @move = Lizard.new
+    when :Spock    then @move = Spock.new
+    end
+  end
+end
+
+class Adaptive
+  # If rock has been the choice for the computer over 60% of the time that
+  # it has lost a round, this decreases the chance that the computer
+  # will choose rock in the current round.
+
+  def initialize
+    @round_history = { human_won: 0, computer_chose_rock: 0 }
+    @possible_moves = Move::VALID_CHOICES.values
+  end
+
+  def update_move_history!(computer_move)
+    @round_history[:human_won] += 1
+    @round_history[:computer_chose_rock] += 1 if computer_move == :rock
+  end
+
+  def implement_rule?
+    if (@round_history[:human_won]).positive?
+      (@round_history[:computer_chose_rock] / @round_history[:human_won]) > 0.6
+    else
+      false
     end
   end
 
   def standard_choice
-    Move::VALUES.sample
-  end
-
-  def personality_based_choice
-    choices = determine_personality_behavior
-    random_value = rand(0..100)
-    choices.each do |move, range|
-      return move if range.include?(random_value)
-    end
+    @possible_moves.sample
   end
 
   def rule_based_choice
     moves = []
-    Move::VALUES.each do |move|
-      if move != 'rock'
-        (moves << move << move)
-      else
-        moves << move
-      end
+    @possible_moves.each do |move|
+      moves << move
+      moves << move unless move == :rock
     end
     moves.sample
   end
 
-  def determine_choice
-    if @strategy == :adaptive
-      if rules.implement_rule?
-        rule_based_choice
-      else
-        standard_choice
-      end
-    else
-      personality_based_choice
+  def choose
+    implement_rule? ? rule_based_choice : standard_choice
+  end
+end
+
+class FixedPersonality
+  def initialize(name)
+    @possible_choices = determine_personality_behavior(name)
+  end
+
+  def determine_personality_behavior(name)
+    case name
+    when 'R2D2'     then { rock: (0..100) }
+    when 'Hal'      then { rock: (0..5), scissors: (6..50),
+                           lizard: (51..75), Spock: (76..100) }
+    when 'Chappie'  then { rock: (0..33), paper: (34..66),
+                           scissors: (67..100) }
+    when 'Sonny'    then { rock: (0..20), paper: (21..40),
+                           scissors: (41..60), lizard: (61..80),
+                           Spock: (81..100) }
+    when 'Number 5' then { paper: (0..50), Spock: (51..100) }
     end
   end
 
   def choose
-    choice = determine_choice
-    case choice
-    when 'rock'     then @move = Rock.new
-    when 'paper'    then @move = Paper.new
-    when 'scissors' then @move = Scissors.new
-    when 'lizard'   then @move = Lizard.new
-    when 'Spock'    then @move = Spock.new
+    random_value = rand(0..100)
+    @possible_choices.each do |move, range|
+      return move if range.include?(random_value)
     end
   end
 end
@@ -342,6 +375,11 @@ class RPSGame
     puts
   end
 
+  def update_strategy_history!(round_winner)
+    @computer.strategy.update_move_history!(@computer.move.value) if
+      round_winner == @human && @computer.strategy.class == Adaptive
+  end
+
   def display_score
     puts "#{@human.name} has #{@human.score}. #{@computer.name} has " \
          "#{@computer.score}."
@@ -363,26 +401,29 @@ class RPSGame
   def yes_or_no?(question)
     puts
     answer = nil
+
     loop do
       puts question + ' (y/n)'
-      answer = gets.chomp
-      break if ['y', 'n'].include? answer.downcase
+      answer = gets.chomp.downcase
+      break if ['y', 'n'].include? answer
       puts "Sorry, must be y or n."
     end
-    return false if answer.casecmp('n').zero?
-    return true if answer.casecmp('y').zero?
+
+    answer == 'y'
   end
 
   def play_round
     loop do
       player_moves
-      @history.record_round(@human.move, @computer.move)
+      @history.update_move_history!(@human.move, @computer.move)
       display_moves
+
       round_winner = determine_round_winner
       display_round_winner(round_winner)
+
       round_winner.score.add_point if round_winner
-      @computer.rules.update_round_history!(@computer.move.value) if
-        round_winner == @human
+      update_strategy_history!(round_winner)
+
       display_score
       break if match_winner?
     end
@@ -390,6 +431,7 @@ class RPSGame
 
   def play_match
     display_welcome_message
+
     loop do
       reset_score
       play_round
@@ -397,6 +439,7 @@ class RPSGame
       break unless yes_or_no?('Would you like to play again?')
       clear_screen
     end
+
     @history.display_move_history(@human.name, @computer.name) if
       yes_or_no?('Would you like to see a history of moves before you leave?')
     display_goodbye_message
