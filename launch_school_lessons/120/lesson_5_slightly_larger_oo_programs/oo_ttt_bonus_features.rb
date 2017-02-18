@@ -176,7 +176,7 @@ class Human < Player
     loop do
       puts "Please choose a letter between A and Z to be your marker."
       marker = gets.chomp.upcase
-      break if ('A'..'Z').cover?(marker)
+      break if ('A'..'Z').cover?(marker) && marker.length == 1
       puts "Sorry, not a valid option."
     end
     self.marker = marker
@@ -342,17 +342,20 @@ class TTTGame
   def play_round
     loop do
       display_board
-
-      loop do
-        current_player_moves
-        break if board.someone_won? || board.full?
-        clear_screen_and_display_board if human_turn?
-      end
-
+      player_turns
       @score.update_score!(board.winning_marker)
       display_round_result
       break if @score.game_winner?
       reset_round
+    end
+  end
+
+  def player_turns
+    loop do
+      current_player_moves
+      alternate_player
+      break if board.someone_won? || board.full?
+      clear_screen_and_display_board if human_turn?
     end
   end
 
@@ -379,7 +382,6 @@ class TTTGame
 
   def current_player_moves
     human_turn? ? human_moves : computer_moves
-    @current_marker = alternate_player
   end
 
   def human_turn?
@@ -387,7 +389,11 @@ class TTTGame
   end
 
   def alternate_player
-    @current_marker == human.marker ? computer.marker : human.marker
+    @current_marker = if @current_marker == human.marker
+                        computer.marker
+                      else
+                        human.marker
+                      end
   end
 
   def display_round_result
@@ -401,7 +407,7 @@ class TTTGame
     else
       puts "It's a tie!"
     end
-    
+
     @score.display_score
     press_enter_to_continue
   end
