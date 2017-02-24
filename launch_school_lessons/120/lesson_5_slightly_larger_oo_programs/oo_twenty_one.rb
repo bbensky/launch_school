@@ -1,10 +1,12 @@
+require 'pry'
+
 module Displayable
   def clear
     system('clear') || system('cls')
   end
 
   def joinor(arr, delimiter=', ', word='or')
-    joinor_arr = arr.map { |el| el }
+    joinor_arr = arr.dup
 
     joinor_arr[-1] = "#{word} #{joinor_arr.last}" if joinor_arr.size > 1
 
@@ -21,6 +23,12 @@ module Displayable
     puts ""
   end
 
+  def display_goodbye_message(game)
+    puts "Thanks for playing #{game}! Goodbye!"
+  end
+end
+
+module Choosable
   def play_again?
     answer = nil
     loop do
@@ -31,21 +39,18 @@ module Displayable
     end
     answer == 'y'
   end
-
-  def display_goodbye_message(game)
-    puts "Thanks for playing #{game}! Goodbye!"
-  end
 end
 
 class Participant
-  attr_accessor :cards, :staying, :busted
+  attr_accessor :busted
+  attr_reader :staying, :hand
 
   def initialize
     reset
   end
 
   def hit(deck)
-    @cards << deck.deal_one_card
+    @hand << deck.deal_one_card
   end
 
   def stay
@@ -53,99 +58,78 @@ class Participant
   end
 
   def busted?
-    total > Game::WINNING_TOTAL
+    @busted = true if total > Game::WINNING_TOTAL
   end
 
   def total
-    if cards.any? { |card| card.name == 'Ace' }
-      total_with_aces
-    else
-      cards.inject(0) { |sum, card| sum + card.value }
-    end
+    total = hand.inject(0) { |sum, card| sum + card.value }
+
+    number_of_aces = hand.count { |card| card.name == 'Ace' }
+
+    number_of_aces.times { total -= 10 if total > Game::WINNING_TOTAL }
+
+    total
   end
 
   def reset
-    self.cards = []
-    self.staying = false
-    self.busted = false
-  end
-
-  private
-
-  def total_with_aces
-    non_aces = cards.reject { |card| card.name == 'Ace' }
-    non_aces_total = non_aces.inject(0) { |sum, card| sum + card.value }
-
-    number_of_aces = cards.count { |card| card.name == 'Ace' }
-    value_of_aces = number_of_aces
-
-    difference = Game::WINNING_TOTAL - non_aces_total
-
-    number_of_aces.times do
-      if value_of_aces + 10 <= difference
-        value_of_aces += 10
-      end
-    end
-
-    value_of_aces + non_aces_total
+    @hand = []
+    @staying = false
+    @busted = false
   end
 end
 
 class Card
-  attr_accessor :name, :value, :dealt
+  attr_accessor :name, :value
 
-  def initialize(name, value)
+  def initialize(name)
     @name = name
-    @value = value
-    @dealt = false
+    @value = assign_value
   end
 
   def to_s
     @name
+  end
+
+  private
+
+  def assign_value
+    case @name
+    when @name.to_i.to_s then @name.to_i
+    when 'Ace'           then 11
+    else                      10
+    end
   end
 end
 
 class Deck
   CARDS = %w(2 3 4 5 6 7 8 9 10 Jack Queen King Ace)
 
-  attr_accessor :cards
+  attr_accessor :deck
 
   def initialize
-    @cards = []
+    @deck = []
     build_deck
   end
+
+  def deal_one_card
+    build_deck if deck.empty?
+    deck.shift
+  end
+
+  private
 
   def build_deck
     CARDS.each do |card|
       4.times do
-        cards << if card.to_i.to_s == card
-                   Card.new(card, card.to_i)
-                 elsif card == 'Ace'
-                   Card.new(card, 1)
-                 else
-                   Card.new(card, 10)
-                 end
+        deck << Card.new(card)
       end
     end
-  end
-
-  def deal_one_card
-    if cards.all? { |card| card.dealt == true }
-      cards.each { |card| card.dealt = false }
-    end
-
-    dealt_card = cards.select do |card|
-      card.dealt == false
-    end.sample
-
-    dealt_card.dealt = true
-
-    dealt_card
+    deck.shuffle!
   end
 end
 
 class Game
-  include Displayable
+  include Displayable, Choosable
 
   WINNING_TOTAL = 21
   INITIAL_CARDS = 2
@@ -178,21 +162,23 @@ class Game
   private
 
   def gameplay
-    deal_cards
-    display_cards
+    deal_deck
+    display_deck
     player_turn
     return if @player.busted
     dealer_turn
   end
 
-  def deal_cards
-    INITIAL_CARDS.times { @player.cards << @deck.deal_one_card }
-    INITIAL_CARDS.times { @dealer.cards << @deck.deal_one_card }
+  def deal_deck
+    INITIAL_CARDS.times { @player.hand << @deck.deal_one_card }
+    INITIAL_CARDS.times { @dealer.hand << @deck.deal_one_card }
   end
 
-  def display_cards
-    puts "Dealer has: #{@dealer.cards[0]} and unknown card."
-    puts "You have: #{joinor(@player.cards, ', ', 'and')}."
+  def display_deck
+    puts "Dealer has: #{@dealer.hand[0]} and unknown card."
+    puts "You have: #{joinor(@player.hand, ', ', 'and')}."
+    puts ""
+    puts "Your current total: #{@player.total}."
     puts ""
   end
 
@@ -205,10 +191,9 @@ class Game
       when 's' then @player.stay
       end
 
-      @player.busted = true if @player.busted?
-      break if @player.staying || @player.busted
+      break if @player.staying || @player.busted?
       clear
-      display_cards
+      display_deck
     end
   end
 
@@ -216,7 +201,7 @@ class Game
     answer = nil
     loop do
       puts "(h)it or (s)tay?"
-      answer = gets.chomp
+      answer = gets.chomp.downcase
       break if ['h', 's'].include?(answer[0])
       puts "Sorry, not a valid choice."
     end
@@ -235,17 +220,17 @@ class Game
     end
   end
 
-  def display_final_cards
+  def display_final_deck
     clear
-    puts "Dealer has: #{joinor(@dealer.cards, ', ', 'and')}."
-    puts "You have: #{joinor(@player.cards, ', ', 'and')}."
+    puts "Dealer has: #{joinor(@dealer.hand, ', ', 'and')}."
+    puts "You have: #{joinor(@player.hand, ', ', 'and')}."
     puts ""
     puts "Dealer total: #{@dealer.total}. Your total: #{@player.total}"
-    puts
+    puts ""
   end
 
   def show_result
-    display_final_cards
+    display_final_deck
     if @player.busted
       puts "You busted! Dealer won!"
     elsif @dealer.busted
