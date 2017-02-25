@@ -9,8 +9,10 @@ Closures in Ruby
 
 `Proc` object - how closures are implemented in Ruby
 
-How to work with closures ir Ruby:
+How to work with closures in Ruby:
 
 1) Instantiate an object from the `Proc` class
+
 2) lambdas
+
 3) blocks
