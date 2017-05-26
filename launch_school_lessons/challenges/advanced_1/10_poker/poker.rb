@@ -185,10 +185,3 @@ class Poker
     winners.select { |hand| hand.cards_with_card_count(num) == top_rank}
   end
 end
-
-spade_straight_to_9 = %w(9S 8S 7S 6S 5S)
-diamond_straight_to_9 = %w(9D 8D 7D 6D 5D)
-three_of_4 = %w(4D 4S 4H QS KS)
-hands = [spade_straight_to_9, diamond_straight_to_9, three_of_4]
-game = Poker.new(hands)
-p game.best_hand
