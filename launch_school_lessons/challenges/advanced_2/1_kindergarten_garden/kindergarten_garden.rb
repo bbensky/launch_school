@@ -1,5 +1,3 @@
-require 'pry'
-
 DEFAULT_STUDENTS = %w(Alice Bob Charlie David Eve Fred Ginny Harriet
                       Ileana Joseph Kincaid Larry)
 PLANTS_AND_INITIALS = { clover: 'C', grass: 'G', radishes: 'R', violets: 'V' }
