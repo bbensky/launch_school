@@ -1,5 +1,5 @@
-CARD_RANKINGS = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A']
-HAND_RANKINGS = [:straight_flush?, :four_of_a_kind?, :full_house?, :flush?, 
+CARD_RANKINGS = %w[2 3 4 5 6 7 8 9 T J Q K A].freeze
+HAND_RANKINGS = [:straight_flush?, :four_of_a_kind?, :full_house?, :flush?,
                  :straight?, :three_of_a_kind?, :two_pair?, :one_pair?,
                  :high_card]
 
@@ -10,7 +10,7 @@ class Hand
     @hand         = hand
     @sorted_hand  = sort_hand
     @high_card    = determine_high_card
-    @card_ranks   = get_ranks
+    @card_ranks   = find_ranks
     @hand_ranking = calculate_ranking
   end
 
@@ -33,16 +33,16 @@ class Hand
   end
 
   def determine_high_card
-    get_ranks.max { |rank| card_rankings_index(rank) }
+    find_ranks.max { |rank| card_rankings_index(rank) }
   end
 
-  def get_ranks
+  def find_ranks
     sorted_hand.map { |card| card[0] }
   end
 
   def calculate_ranking
     HAND_RANKINGS.each do |ranking|
-      return ranking if self.send ranking 
+      return ranking if send ranking
     end
   end
 
@@ -80,10 +80,6 @@ class Hand
     three_of_a_kind? && one_pair?
   end
 
-  def sequence?
-
-  end
-
   def straight?
     if card_ranks == ['2', '3', '4', '5', 'A']
       return true
@@ -92,11 +88,10 @@ class Hand
     current_card_rankings_index = card_rankings_index(sorted_hand.first)
 
     sorted_hand[1..4].each do |card|
-      if card_rankings_index(card) == current_card_rankings_index + 1
-        current_card_rankings_index = card_rankings_index(card)
-      else
-        return false
-      end
+      return false unless card_rankings_index(card) ==
+                          current_card_rankings_index + 1
+
+      current_card_rankings_index = card_rankings_index(card)
     end
 
     true
@@ -123,14 +118,12 @@ class Poker
 
   def best_hand
     top_ranking = determine_top_ranking
-    
+
     add_to_winners { |hand| hand.hand_ranking == top_ranking }
 
-    if winners.size > 1
-      self.winners = break_tie(top_ranking)
-    end
+    self.winners = break_tie(top_ranking) if winners.size > 1
 
-    winners.map { |hand| hand.hand }
+    winners.map(&:hand)
   end
 
   private
@@ -154,7 +147,8 @@ class Poker
 
   def determine_top_ranking
     hands.min do |a, b|
-      HAND_RANKINGS.index(a.hand_ranking) <=> HAND_RANKINGS.index(b.hand_ranking)
+      HAND_RANKINGS.index(a.hand_ranking) <=>
+        HAND_RANKINGS.index(b.hand_ranking)
     end.hand_ranking
   end
 
@@ -177,11 +171,11 @@ class Poker
   end
 
   def select_winner_high_card
-    winners.select { |hand| hand.high_card == top_high_card } 
+    winners.select { |hand| hand.high_card == top_high_card }
   end
 
   def select_winner_high_card_from_card_count(num)
     top_rank = winners.map { |hand| hand.cards_with_card_count(num) }.max
-    winners.select { |hand| hand.cards_with_card_count(num) == top_rank}
+    winners.select { |hand| hand.cards_with_card_count(num) == top_rank }
   end
 end
