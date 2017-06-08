@@ -1,11 +1,12 @@
-DEFAULT_STUDENTS = %w(Alice Bob Charlie David Eve Fred Ginny Harriet
-                      Ileana Joseph Kincaid Larry)
-PLANTS_AND_INITIALS = { clover: 'C', grass: 'G', radishes: 'R', violets: 'V' }
+DEFAULT_STUDENTS = %w[Alice Bob Charlie David Eve Fred Ginny Harriet
+                      Ileana Joseph Kincaid Larry].freeze
+PLANTS_INITIALS = { clover: 'C', grass: 'G', radishes: 'R',
+                    violets: 'V' }.freeze
 
 class Garden
   attr_reader :students, :plant_rows, :students_and_plants, :student_indices
 
-  def initialize(diagram, students=DEFAULT_STUDENTS)
+  def initialize(diagram, students = DEFAULT_STUDENTS)
     @students            = students.sort
     @student_indices     = generate_student_indices
     @plant_rows          = generate_plant_rows(diagram)
@@ -17,7 +18,7 @@ class Garden
 
   def generate_singleton_methods
     students.each do |student|
-      self.define_singleton_method(student.downcase.to_sym) do
+      define_singleton_method(student.downcase.to_sym) do
         students_and_plants[student]
       end
     end
@@ -27,22 +28,17 @@ class Garden
     result = {}
     all_indices = []
     current_indices = []
-    max_index = (@students.size * 2) - 1
 
-    0.upto(max_index) do |index|
+    0.upto((@students.size * 2) - 1) do |index|
       current_indices << index
-      if index.odd?
-        all_indices << current_indices
-        current_indices = []
-        next
-      end
+      next unless index.odd?
+      all_indices << current_indices
+      current_indices = []
     end
 
-    students.each_with_index do |student, idx|
-      result[student] = all_indices[idx]
-    end
+    students.each_with_index { |stud, idx| result[stud] = all_indices[idx] }
 
-   result
+    result
   end
 
   def student_plant_hash
@@ -51,9 +47,7 @@ class Garden
     plant_rows.each do |row|
       row.each_with_index do |plant, idx|
         student_indices.each do |student, indices|
-          if indices.include?(idx)
-            result[student] << PLANTS_AND_INITIALS.key(plant)
-          end
+          result[student] << PLANTS_INITIALS.key(plant) if indices.include?(idx)
         end
       end
     end
@@ -68,8 +62,7 @@ class Garden
   end
 
   def generate_plant_rows(diagram)
-    rows   = diagram.split("\n")
-    plants = rows.map { |row| row.split('') }
+    rows = diagram.split("\n")
+    rows.map { |row| row.split('') }
   end
 end
-
